@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useProfile } from "../ui/ProfileContext";
 import FacultyNavbar from "../ui/facultynavbar";
+import { submitFacultyReferral } from "../../firebase/facultyReferralService";
+
 
 export default function Forms() {
   const navigate = useNavigate();
@@ -34,6 +36,27 @@ export default function Forms() {
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
+
+  const handleSubmit = async () => {
+    console.log("Submitting referral with data:", formData); // Debugging log
+  
+    try {
+      const result = await submitFacultyReferral(formData);
+      console.log("Submission result:", result); // Debugging log
+  
+      if (result.success) {
+        alert("Referral submitted successfully!");
+        navigate("/facultydash"); // Redirect after submission
+      } else {
+        alert("Error submitting referral: " + result.error);
+      }
+    } catch (error) {
+      console.error("Error in handleSubmit:", error);
+      alert("Unexpected error: " + error.message);
+    }
+  };
+  
+  
 
   const handleCheckboxChange = (e) => {
     const { value, checked } = e.target;
@@ -142,7 +165,7 @@ export default function Forms() {
           {step > 0 && (
             <button onClick={prevStep} className="px-4 py-2 border border-gray-400 rounded-md">Back</button>
           )}
-          <button onClick={step === steps.length - 1 ? () => console.log("Submit Referral", formData) : nextStep} className="px-4 py-2 bg-[#3B021F] text-white rounded-md flex items-center">
+          <button onClick={step === steps.length - 1 ? handleSubmit : nextStep} className="px-4 py-2 bg-[#3B021F] text-white rounded-md flex items-center">
             {step === steps.length - 1 ? "Submit Referral" : "Next"}
             {step !== steps.length - 1 && <span className="ml-2">→</span>}
           </button>
